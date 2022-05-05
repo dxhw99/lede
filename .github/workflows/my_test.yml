@@ -67,6 +67,18 @@ jobs:
           ./scripts/feeds update -a
           ./scripts/feeds install -a
 
+      - name: Load custom configuration
+        run: |
+         [ -e files ] && mv files openwrt/files
+         [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
+         chmod +x $DIY_P2_SH
+         cd openwrt
+         $GITHUB_WORKSPACE/$DIY_P2_SH
+      - name: SSH connection to Actions
+        uses: dxhw99/debugger-action@master
+        if: env.SSH_ACTIONS == 'true' || contains(github.event.action, 'ssh')
+
+
       - name: Generate configuration file
         run: make defconfig
 
